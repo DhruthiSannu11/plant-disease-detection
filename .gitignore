@@ -1,0 +1,55 @@
+# Python / PyTorch
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.pth
+*.pt
+*.onnx
+*.onnx.data
+models/*.pth
+models/*.onnx
+
+# Data & Large Datasets
+data/raw/
+data/processed/
+*.zip
+*.tar.gz
+*.h5
+
+# Node.js / Next.js / React
+node_modules/
+.next/
+out/
+build/
+dist/
+.cache/
+
+# Docker & Logs
+*.log
+logs/
+.dvc/tmp/
+.dvc/cache/
+
+# Environment & Secrets
+.env
+.env.local
+.env.production
+*.pem
+*.key
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Developer Internal Logs
+# (Keep roadmap.md tracked if committing internal docs, but ignore temporary logs)
+scratch/
+LOGS.md
