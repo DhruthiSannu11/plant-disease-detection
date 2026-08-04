@@ -1,0 +1,24 @@
+# 100% Free Open-Source Python Stack for Plant Disease Detection Backend
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+python-multipart>=0.0.9
+
+# ML & Computer Vision Engine (PyTorch CPU / ONNX)
+torch>=2.2.0
+torchvision>=0.17.0
+pillow>=10.2.0
+opencv-python-headless>=4.9.0.80
+numpy>=1.26.4
+onnxruntime>=1.17.1
+
+# Database & Cache (PostgreSQL 16 & Redis 7)
+asyncpg>=0.29.0
+sqlalchemy[asyncio]>=2.0.28
+redis>=5.0.3
+
+# Utilities & Logging
+structlog>=24.1.0
+pytest>=8.0.2
+httpx>=0.27.0

@@ -1,30 +1,39 @@
-# 🌿 Plant Disease Detection System (2026 Edition)
+# 🌿 Plant Health AI: Enterprise Disease Detection & Botanical Diagnostics
 
-An end-to-end, enterprise-grade AI system for agricultural leaf disease classification, explainable AI (Grad-CAM heatmaps), botanical treatment recommendations, and real-time farmer diagnostic reporting.
+> **Production-grade Plant Disease Detection platform powered by PyTorch, ONNX INT8 Quantization, Explainable AI (Grad-CAM), FastAPI, and Next.js.**
 
-## 🌟 Key Features
-- **Deep Learning Engine**: PyTorch 2.x transfer learning (EfficientNet-V2 / MobileNetV4) trained on 38 plant disease classes.
-- **Ultra-Fast CPU Inference**: Quantized ONNX Runtime INT8 model execution (<50ms per scan).
-- **Explainable AI (XAI)**: Grad-CAM visual heatmaps overlaying diseased leaf regions so farmers understand the diagnosis.
-- **Botanical Knowledge Base**: Automated organic remedies, chemical pesticides, and prevention protocols for each disease.
-- **Modern Full-Stack UI**: Responsive Next.js / React app with drag-and-drop file upload, live webcam scanner, PWA offline support, and multi-language localization.
-- **Outbreak Geo-Mapping**: GeoJSON heatmap tracking crop disease outbreaks by location.
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://python.org)
+[![PyTorch 2.x](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Async-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-INT8_Quantized-005C8A?logo=onnx&logoColor=white)](https://onnxruntime.ai)
+[![Next.js](https://img.shields.io/badge/Next.js-14+-000000?logo=next.js&logoColor=white)](https://nextjs.org)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Container-2496ED?logo=docker&logoColor=white)](https://docker.com)
+
+---
+
+## 🌟 Key Platform Capabilities
+
+- 🚀 **Sub-50ms Inference**: Quantized ONNX Runtime INT8 execution running smoothly on low-cost CPU servers.
+- 🎯 **Explainable AI (Grad-CAM)**: Visual heatmap overlay showing exact diseased leaf spots behind every AI diagnosis.
+- 💊 **Botanical Treatment Engine**: Automated organic remedies, chemical pesticides, and prevention protocols for 38+ plant disease classes.
+- 📱 **Offline-First PWA**: Mobile webcam/camera scanner with offline service worker caching for field agronomists.
+- 🗺️ **Outbreak Geo-Mapping**: Real-time geospatial tracking of crop disease clusters.
+
+---
 
 ## 🚀 Quick Start (Local Docker Development)
+
 ```bash
 # Clone repository
-git clone https://github.com/your-username/plant-disease-detection.git
+git clone https://github.com/DhruthiSannu11/plant-disease-detection.git
 cd plant-disease-detection
 
-# Copy environment variables
+# Copy environment configuration
 cp .env.example .env
 
 # Start multi-container stack
 docker-compose up --build
 ```
 
-- **Backend API**: `http://localhost:8000/docs` (FastAPI Swagger)
-- **Frontend App**: `http://localhost:3000` (Next.js / React)
-
-## 📖 Developer Documentation & Master Roadmap
-For complete project roadmap, execution protocol, financial breakdown, and ticket specifications, see [`roadmap.md`](./roadmap.md).
+- **Backend API**: `http://localhost:8000/docs` (FastAPI Swagger UI)
+- **Frontend Web App**: `http://localhost:3000` (Next.js / React)
