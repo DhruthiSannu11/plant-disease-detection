@@ -1,3 +1,9 @@
+# Internal Developer Docs & AI Protocols (Kept 100% Private on Local Machine)
+roadmap.md
+.agents/
+LOGS.md
+scratch/
+
 # Python / PyTorch
 __pycache__/
 *.py[cod]
@@ -48,8 +54,3 @@ logs/
 .idea/
 .DS_Store
 Thumbs.db
-
-# Developer Internal Logs
-# (Keep roadmap.md tracked if committing internal docs, but ignore temporary logs)
-scratch/
-LOGS.md
