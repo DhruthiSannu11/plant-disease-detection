@@ -8,8 +8,18 @@
 [![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-INT8_Quantized-005C8A?logo=onnx&logoColor=white)](https://onnxruntime.ai)
 [![Next.js](https://img.shields.io/badge/Next.js-14+-000000?logo=next.js&logoColor=white)](https://nextjs.org)
 [![Docker](https://img.shields.io/badge/Docker-Multi--Container-2496ED?logo=docker&logoColor=white)](https://docker.com)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DhruthiSannu11/plant-disease-detection/blob/main/notebooks/plant_disease_colab_setup.ipynb)
 
 ---
+
+## ☁️ Google Colab Cloud Data & Training
+
+Execute dataset setup, image preprocessing, and GPU model training directly in Google Colab:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DhruthiSannu11/plant-disease-detection/blob/main/notebooks/plant_disease_colab_setup.ipynb)
+
+---
+
 
 ## 🌟 Key Platform Capabilities
 
