@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timezone
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -10,7 +11,7 @@ app = FastAPI(
     description="Production-Grade Botanical Diagnostic & Explainable AI (Grad-CAM) Microservice",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # Configure CORS Middleware
@@ -41,10 +42,11 @@ async def health_check():
         service="Plant Disease Detection API Engine",
         version="1.0.0",
         timestamp=datetime.now(timezone.utc).isoformat(),
-        environment=os.getenv("ENVIRONMENT", "development")
+        environment=os.getenv("ENVIRONMENT", "development"),
     )
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
