@@ -14,6 +14,13 @@ import zipfile
 import shutil
 from pathlib import Path
 
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+
 # Open-access PlantVillage mirror dataset archive URL
 DEFAULT_DATASET_URL = "https://github.com/spMohanty/PlantVillage-Dataset/archive/refs/heads/master.zip"
 KAGGLE_DATASET_HANDLE = "abdallahalmamun/plantvillage-dataset"

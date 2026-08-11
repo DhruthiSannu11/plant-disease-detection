@@ -16,6 +16,13 @@ import argparse
 from pathlib import Path
 from PIL import Image
 
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+
 def is_valid_image(filepath: Path) -> bool:
     """Check if image file is non-empty and readable by Pillow."""
     if not filepath.is_file() or filepath.stat().st_size == 0:
