@@ -1,0 +1,24 @@
+# Plant Disease Detection Model Training Configuration
+model:
+  name: "efficientnet_v2_s"
+  num_classes: 38
+  pretrained: true
+  dropout_rate: 0.3
+  hidden_dim: 512
+
+dataset:
+  image_size: 224
+  channels: 3
+  batch_size: 32
+  num_workers: 4
+  train_dir: "data/processed/train"
+  val_dir: "data/processed/val"
+  test_dir: "data/processed/test"
+
+training:
+  epochs: 15
+  learning_rate: 0.001
+  weight_decay: 0.01
+  label_smoothing: 0.1
+  checkpoint_dir: "ml/checkpoints"
+  model_filename: "best_model.pth"
