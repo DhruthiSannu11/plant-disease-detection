@@ -35,5 +35,6 @@ cp .env.example .env
 docker-compose up --build
 ```
 
-- **Backend API**: `http://localhost:8000/docs` (FastAPI Swagger UI)
-- **Frontend Web App**: `http://localhost:3000` (Next.js / React)
+- **REST API Endpoints**: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health) (JSON REST API)
+- **Interactive REST API Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs) (Swagger UI)
+- **Frontend Web App**: [http://localhost:3000](http://localhost:3000) (Next.js / React)

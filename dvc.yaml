@@ -1,0 +1,18 @@
+stages:
+  download:
+    cmd: python scripts/dataset_downloader.py --output-dir data/raw
+    deps:
+      - scripts/dataset_downloader.py
+    outs:
+      - data/raw/plantvillage
+
+  preprocess:
+    cmd: python scripts/preprocess_dataset.py --raw-dir data/raw/plantvillage --output-dir data/processed
+    deps:
+      - scripts/preprocess_dataset.py
+      - data/raw/plantvillage
+    outs:
+      - data/processed/train
+      - data/processed/val
+      - data/processed/test
+      - data/processed/dataset_summary.json
