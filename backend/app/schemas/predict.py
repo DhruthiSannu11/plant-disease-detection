@@ -18,6 +18,8 @@ class PredictionResponse(BaseModel):
     """Complete diagnostic prediction response model."""
 
     success: bool = Field(True, description="API execution status")
+    is_valid_leaf: bool = Field(True, description="Whether the uploaded image was recognized as a valid plant leaf")
+    warning_message: Optional[str] = Field(None, description="Warning message if image is out-of-domain or low-confidence")
     prediction: ClassPrediction = Field(..., description="Top-1 highest confidence disease prediction")
     top_k: List[ClassPrediction] = Field(..., description="Top-K disease predictions ordered by confidence")
     inference_time_ms: float = Field(..., description="ONNX model inference latency in milliseconds")
