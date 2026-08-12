@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from backend.app.api.v1.predict import router as predict_router
+
 # Initialize FastAPI Application
 app = FastAPI(
     title="Plant Disease Detection API",
@@ -22,6 +24,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register API Routers
+app.include_router(predict_router, prefix="/api/v1")
 
 
 class HealthResponse(BaseModel):
