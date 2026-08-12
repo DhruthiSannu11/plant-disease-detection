@@ -92,14 +92,16 @@ def test_predict_empty_payload():
 
 
 def test_predict_low_confidence_image():
-    """Verify POST /api/v1/predict with low-confidence / non-leaf image returns HTTP 422 Unprocessable Entity."""
-    # Create pure grey noise image
-    noise_np = np.random.randint(120, 136, (224, 224, 3), dtype=np.uint8)
-    img = Image.fromarray(noise_np)
+    """Verify POST /api/v1/predict with grayscale CT scan / medical image returns HTTP 422 Unprocessable Entity."""
+    # Create pure grayscale medical CT scan simulation image
+    ct_np = np.zeros((224, 224, 3), dtype=np.uint8)
+    ct_np[50:170, 50:170] = 180
+    ct_np[80:130, 80:130] = 60
+    img = Image.fromarray(ct_np)
     buffer = io.BytesIO()
     img.save(buffer, format="JPEG")
 
-    files = {"file": ("noise.jpg", buffer.getvalue(), "image/jpeg")}
+    files = {"file": ("ct_scan.jpg", buffer.getvalue(), "image/jpeg")}
     response = client.post("/api/v1/predict", files=files)
 
     assert response.status_code == 422

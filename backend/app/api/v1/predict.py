@@ -73,7 +73,25 @@ async def predict_plant_disease(
             detail="❌ Corrupted or invalid image file data. Unable to parse image.",
         )
 
-    # 4. Execute ONNX Model Classification
+    # 4. Grayscale / Medical Scan / X-Ray Guardrail Check
+    # Medical CT scans, X-rays, and documents are monochromatic/grayscale (RGB channel diff < 5.0)
+    import numpy as np
+    img_rgb_np = np.array(image.convert("RGB"), dtype=np.float32)
+    rgb_channel_diff = np.mean(
+        np.abs(img_rgb_np[:, :, 0] - img_rgb_np[:, :, 1])
+        + np.abs(img_rgb_np[:, :, 1] - img_rgb_np[:, :, 2])
+    )
+
+    if rgb_channel_diff < 5.0:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                "⚠️ Unrecognized / Non-Leaf Image. The uploaded image is a grayscale scan or medical image "
+                "(e.g., CT scan, X-ray, or document). Please upload a color photo of a plant leaf."
+            ),
+        )
+
+    # 5. Execute ONNX Model Classification
     try:
         onnx_service = ONNXInferenceService()
         raw_predictions, inference_time_ms = onnx_service.predict(image, top_k=3)
@@ -98,18 +116,6 @@ async def predict_plant_disease(
         )
         for p in raw_predictions
     ]
-
-    # 5. Out-of-Domain / Low-Confidence Guardrail Check (Threshold: 4.0% / 0.04)
-    # Random uniform distribution across 38 classes is 2.63%. Non-leaf CT scans get 2.7%.
-    CONFIDENCE_THRESHOLD = 0.04
-    if top_1_prediction.confidence < CONFIDENCE_THRESHOLD:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=(
-                f"⚠️ Unrecognized / Non-Leaf Image. Low prediction confidence ({top_1_prediction.confidence * 100:.1f}%). "
-                "Please upload a clear, focused photo of a plant leaf."
-            ),
-        )
 
     # 6. Generate Grad-CAM Visual Heatmap Base64
     heatmap_base64 = None
