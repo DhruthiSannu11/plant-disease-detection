@@ -15,6 +15,7 @@ venv/
 .venv/
 ENV/
 *.pth
+!ml/checkpoints/*.pth
 *.pt
 *.onnx
 *.onnx.data
