@@ -10,7 +10,10 @@ dataset:
   image_size: 224
   channels: 3
   batch_size: 32
-  num_workers: 4
+  num_workers: 0
+
+
+
   train_dir: "data/processed/train"
   val_dir: "data/processed/val"
   test_dir: "data/processed/test"
