@@ -99,14 +99,16 @@ async def predict_plant_disease(
         for p in raw_predictions
     ]
 
-    # 5. Out-of-Domain / Low-Confidence Guardrail Check (Min threshold: 15% / 0.15)
-    CONFIDENCE_THRESHOLD = 0.15
-    is_valid_leaf = top_1_prediction.confidence >= CONFIDENCE_THRESHOLD
-    warning_message = None
-    if not is_valid_leaf:
-        warning_message = (
-            f"⚠️ Low confidence prediction ({top_1_prediction.confidence*100:.1f}%). "
-            "The uploaded image does not appear to be a recognized plant leaf or disease scan."
+    # 5. Out-of-Domain / Low-Confidence Guardrail Check (Threshold: 4.0% / 0.04)
+    # Random uniform distribution across 38 classes is 2.63%. Non-leaf CT scans get 2.7%.
+    CONFIDENCE_THRESHOLD = 0.04
+    if top_1_prediction.confidence < CONFIDENCE_THRESHOLD:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"⚠️ Unrecognized / Non-Leaf Image. Low prediction confidence ({top_1_prediction.confidence * 100:.1f}%). "
+                "Please upload a clear, focused photo of a plant leaf."
+            ),
         )
 
     # 6. Generate Grad-CAM Visual Heatmap Base64
@@ -122,8 +124,6 @@ async def predict_plant_disease(
     # 7. Format Response
     return PredictionResponse(
         success=True,
-        is_valid_leaf=is_valid_leaf,
-        warning_message=warning_message,
         prediction=top_1_prediction,
         top_k=top_k_predictions,
         inference_time_ms=round(inference_time_ms, 2),

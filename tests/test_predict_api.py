@@ -34,10 +34,18 @@ def test_health_check_endpoint():
     assert "service" in data
 
 
-def test_predict_valid_image():
+def test_predict_valid_image(monkeypatch):
     """Verify POST /api/v1/predict with valid JPEG leaf upload returns prediction & Grad-CAM heatmap."""
-    image_bytes = create_dummy_leaf_image_bytes(format="JPEG")
+    mock_predictions = [
+        {"class_id": 29, "disease_name": "Tomato___Early_blight", "confidence": 0.985},
+        {"class_id": 30, "disease_name": "Tomato___Late_blight", "confidence": 0.010},
+        {"class_id": 32, "disease_name": "Tomato___Septoria_leaf_spot", "confidence": 0.005},
+    ]
 
+    from backend.app.services.onnx_service import ONNXInferenceService
+    monkeypatch.setattr(ONNXInferenceService, "predict", lambda self, img, top_k=3: (mock_predictions, 18.5))
+
+    image_bytes = create_dummy_leaf_image_bytes(format="JPEG")
     files = {"file": ("test_leaf.jpg", image_bytes, "image/jpeg")}
     response = client.post("/api/v1/predict", files=files)
 
@@ -46,10 +54,8 @@ def test_predict_valid_image():
 
     assert data["success"] is True
     assert "prediction" in data
-    assert "disease_name" in data["prediction"]
-    assert "confidence" in data["prediction"]
-    assert isinstance(data["prediction"]["confidence"], float)
-    assert 0.0 <= data["prediction"]["confidence"] <= 1.0
+    assert data["prediction"]["disease_name"] == "Tomato___Early_blight"
+    assert data["prediction"]["confidence"] == 0.985
 
     assert "top_k" in data
     assert len(data["top_k"]) == 3
@@ -83,3 +89,20 @@ def test_predict_empty_payload():
     assert response.status_code == 400
     data = response.json()
     assert "empty" in data["detail"].lower()
+
+
+def test_predict_low_confidence_image():
+    """Verify POST /api/v1/predict with low-confidence / non-leaf image returns HTTP 422 Unprocessable Entity."""
+    # Create pure grey noise image
+    noise_np = np.random.randint(120, 136, (224, 224, 3), dtype=np.uint8)
+    img = Image.fromarray(noise_np)
+    buffer = io.BytesIO()
+    img.save(buffer, format="JPEG")
+
+    files = {"file": ("noise.jpg", buffer.getvalue(), "image/jpeg")}
+    response = client.post("/api/v1/predict", files=files)
+
+    assert response.status_code == 422
+    data = response.json()
+    assert "detail" in data
+    assert "Unrecognized / Non-Leaf Image" in data["detail"]
