@@ -6,6 +6,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from backend.app.api.v1.predict import router as predict_router
+from backend.app.api.v1.auth import router as auth_router
+from backend.app.api.v1.scans import router as scans_router
+from backend.app.db.session import init_db
+
+from contextlib import asynccontextmanager
+
+# Application Lifespan Handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        init_db()
+    except Exception as e:
+        print(f"⚠️ Database initialization warning: {e}")
+    yield
 
 # Initialize FastAPI Application
 app = FastAPI(
@@ -14,6 +28,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Configure CORS Middleware
@@ -27,6 +42,8 @@ app.add_middleware(
 
 # Register API Routers
 app.include_router(predict_router, prefix="/api/v1")
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(scans_router, prefix="/api/v1")
 
 
 class HealthResponse(BaseModel):

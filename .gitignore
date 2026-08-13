@@ -50,9 +50,13 @@ logs/
 *.pem
 *.key
 
-# MLflow Local Runs & Database
+# MLflow & SQLite Local Databases
 mlruns/
 mlruns.db
+plant_disease.db
+*.db
+*.sqlite
+*.sqlite3
 .trash/
 
 # IDE & OS
