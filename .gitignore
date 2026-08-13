@@ -50,6 +50,11 @@ logs/
 *.pem
 *.key
 
+# MLflow Local Runs & Database
+mlruns/
+mlruns.db
+.trash/
+
 # IDE & OS
 .vscode/
 .idea/

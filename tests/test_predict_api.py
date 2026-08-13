@@ -57,6 +57,12 @@ def test_predict_valid_image(monkeypatch):
     assert data["prediction"]["disease_name"] == "Tomato___Early_blight"
     assert data["prediction"]["confidence"] == 0.985
 
+    assert "details" in data["prediction"]
+    details = data["prediction"]["details"]
+    assert details["common_name"] == "Tomato Early Blight"
+    assert len(details["organic_remedies"]) > 0
+    assert len(details["chemical_treatments"]) > 0
+
     assert "top_k" in data
     assert len(data["top_k"]) == 3
 
@@ -108,3 +114,21 @@ def test_predict_low_confidence_image():
     data = response.json()
     assert "detail" in data
     assert "Unrecognized / Non-Leaf Image" in data["detail"]
+
+
+def test_predict_non_plant_object_image():
+    """Verify POST /api/v1/predict with non-plant animal / object photo returns HTTP 422 Unprocessable Entity."""
+    # Create golden fur color simulation image (golden retriever fur)
+    fur_np = np.zeros((224, 224, 3), dtype=np.uint8)
+    fur_np[:, :] = [218, 165, 32]  # Goldenrod fur color
+    img = Image.fromarray(fur_np)
+    buffer = io.BytesIO()
+    img.save(buffer, format="JPEG")
+
+    files = {"file": ("dog_photo.jpg", buffer.getvalue(), "image/jpeg")}
+    response = client.post("/api/v1/predict", files=files)
+
+    assert response.status_code == 422
+    data = response.json()
+    assert "detail" in data
+    assert "Non-Plant Image Detected" in data["detail"]

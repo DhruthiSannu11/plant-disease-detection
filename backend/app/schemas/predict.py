@@ -6,12 +6,27 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
+class DiagnosticDetails(BaseModel):
+    """Detailed botanical treatment and diagnostic information."""
+
+    common_name: str = Field(..., description="Human-readable common disease or plant name")
+    scientific_name: str = Field(..., description="Botanical or pathological scientific binomial name")
+    crop: str = Field(..., description="Crop or plant species")
+    pathogen_type: str = Field(..., description="Pathogen category (Fungal, Bacterial, Viral, Insect, None)")
+    severity: str = Field(..., description="Disease severity assessment level (None, Low, Moderate, Severe, Critical)")
+    symptoms: List[str] = Field(..., description="List of key diagnostic leaf and plant symptoms")
+    organic_remedies: List[str] = Field(..., description="List of organic treatments and bio-control methods")
+    chemical_treatments: List[str] = Field(..., description="List of chemical pesticides/fungicides and dosages")
+    preventive_protocols: List[str] = Field(..., description="List of preventive agricultural practices")
+
+
 class ClassPrediction(BaseModel):
     """Prediction for a single plant disease class."""
 
     class_id: int = Field(..., description="Numeric index of the predicted disease class (0-37)")
     disease_name: str = Field(..., description="Botanical & pathological disease class label name")
     confidence: float = Field(..., description="Prediction probability confidence score (0.0 to 1.0)")
+    details: Optional[DiagnosticDetails] = Field(None, description="Botanical knowledge base diagnostic guide details")
 
 
 class PredictionResponse(BaseModel):

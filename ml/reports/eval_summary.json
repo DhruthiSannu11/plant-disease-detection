@@ -1,0 +1,21 @@
+{
+  "accuracy": 0.9368421052631579,
+  "top5_accuracy": 0.9421052631578948,
+  "macro_precision": 0.9423626581175056,
+  "macro_recall": 0.9354399255715045,
+  "macro_f1": 0.936863113459818,
+  "weighted_precision": 0.9395283540712904,
+  "weighted_recall": 0.9368421052631579,
+  "weighted_f1": 0.9362310798484792,
+  "total_samples": 380,
+  "num_classes": 38,
+  "eval_loss": 0.42,
+  "latency": {
+    "mean_latency_ms": 78.61,
+    "p95_latency_ms": 83.93,
+    "min_latency_ms": 72.92,
+    "max_latency_ms": 86.59,
+    "throughput_fps": 12.7
+  },
+  "model_size_mb": 239.91
+}

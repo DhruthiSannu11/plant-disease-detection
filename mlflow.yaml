@@ -1,0 +1,31 @@
+name: plant-disease-detection
+conda_env: null
+
+entry_points:
+  evaluate:
+    parameters:
+      config: {type: str, default: "ml/config.yaml"}
+      checkpoint: {type: str, default: "ml/checkpoints/best_model.pth"}
+      data_dir: {type: str, default: "data/processed"}
+      split: {type: str, default: "val"}
+      dry_run: {type: bool, default: false}
+      register_model: {type: bool, default: false}
+    command: >
+      python ml/evaluate.py
+      --config {config}
+      --checkpoint {checkpoint}
+      --data-dir {data_dir}
+      --split {split}
+      {dry_run}
+      {register_model}
+
+  train:
+    parameters:
+      config: {type: str, default: "ml/config.yaml"}
+      epochs: {type: int, default: 15}
+      dry_run: {type: bool, default: false}
+    command: >
+      python ml/train.py
+      --config {config}
+      --epochs {epochs}
+      {dry_run}
