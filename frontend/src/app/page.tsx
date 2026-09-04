@@ -6,6 +6,7 @@ import { Footer } from '../components/layout/Footer';
 import { GlassCard } from '../components/ui/GlassCard';
 import { Button } from '../components/ui/Button';
 import { Badge, BadgeVariant } from '../components/ui/Badge';
+import { LeafScanner } from '../components/LeafScanner';
 import {
   Sparkles,
   UploadCloud,
@@ -185,65 +186,23 @@ export default function Home() {
 
             {/* Upload & Scanner Card */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Dropzone */}
-              <GlassCard
-                hoverEffect
-                className="flex flex-col items-center justify-center min-h-[340px] border-dashed border-2 border-emerald-500/20 hover:border-emerald-400/50 relative overflow-hidden"
-              >
-                {previewUrl ? (
-                  <div className="flex flex-col items-center w-full space-y-4">
-                    <div className="relative rounded-xl overflow-hidden border border-emerald-500/30 max-h-72 shadow-lg">
-                      <img
-                        src={previewUrl}
-                        alt="Uploaded leaf preview"
-                        className="max-h-72 object-contain"
-                      />
-                      {loading && (
-                        <div className="absolute inset-0 bg-forest-950/70 backdrop-blur-sm flex flex-col items-center justify-center">
-                          <div className="w-full h-1 scanner-laser absolute top-0 animate-scan" />
-                          <div className="text-emerald-300 text-xs font-bold tracking-wide mt-2">
-                            Analyzing Leaf Features...
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      Choose a different photo
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center p-8 space-y-4">
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-3xl text-emerald-400 shadow-glow-emerald">
-                      <UploadCloud className="w-8 h-8" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold text-slate-200">
-                        Upload Plant Leaf Photo
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-1 max-w-xs">
-                        Supports high-resolution JPEG, PNG, or WebP files up to 10MB
-                      </p>
-                    </div>
-                    <Button
-                      variant="primary"
-                      onClick={() => fileInputRef.current?.click()}
-                      leftIcon={<Sparkles className="w-4 h-4" />}
-                    >
-                      Select Photo
-                    </Button>
-                  </div>
-                )}
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileChange}
+              {/* Modular Leaf Scanner */}
+              <GlassCard className="p-4 sm:p-6 border-emerald-500/20 flex flex-col items-center justify-center">
+                <LeafScanner
+                  onImageReady={(file) => {
+                    setSelectedFile(file);
+                    setPreviewUrl(URL.createObjectURL(file));
+                    setResult(null);
+                    setErrorMessage(null);
+                  }}
+                  isAnalyzing={loading}
+                  selectedFile={selectedFile}
+                  onClear={() => {
+                    setSelectedFile(null);
+                    setPreviewUrl(null);
+                    setResult(null);
+                    setErrorMessage(null);
+                  }}
                 />
               </GlassCard>
 
