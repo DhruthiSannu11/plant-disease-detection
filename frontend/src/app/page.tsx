@@ -1,22 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { GlassCard } from '../components/ui/GlassCard';
 import { Button } from '../components/ui/Button';
-import { Badge, BadgeVariant } from '../components/ui/Badge';
+import { Badge } from '../components/ui/Badge';
 import { LeafScanner } from '../components/LeafScanner';
+import { DiagnosticReport } from '../components/DiagnosticReport';
 import {
   Sparkles,
-  UploadCloud,
-  CheckCircle2,
   AlertTriangle,
-  Flame,
   Sprout,
   Activity,
   MapPin,
-  RefreshCw,
   ExternalLink,
 } from 'lucide-react';
 
@@ -64,15 +61,10 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<PredictionResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [activeRemedyTab, setActiveRemedyTab] = useState<
-    'remedies' | 'chemical' | 'symptoms' | 'prevention'
-  >('remedies');
 
   // Outbreak stats
   const [outbreakStats, setOutbreakStats] = useState<OutbreakStats | null>(null);
   const [statsLoading, setStatsLoading] = useState<boolean>(false);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch outbreak stats when switched to outbreak tab
   useEffect(() => {
@@ -85,16 +77,6 @@ export default function Home() {
         .finally(() => setStatsLoading(false));
     }
   }, [currentTab]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      setResult(null);
-      setErrorMessage(null);
-    }
-  };
 
   const handleAnalyze = async () => {
     if (!selectedFile) return;
@@ -124,17 +106,6 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const mapSeverityToBadge = (severity?: string): BadgeVariant => {
-    if (!severity) return 'moderate';
-    const s = severity.toLowerCase();
-    if (s === 'low') return 'low';
-    if (s === 'high') return 'high';
-    if (s === 'severe') return 'severe';
-    if (s === 'critical') return 'critical';
-    if (s === 'healthy') return 'healthy';
-    return 'moderate';
   };
 
   return (
@@ -254,186 +225,39 @@ export default function Home() {
               </GlassCard>
             </div>
 
-            {/* Diagnostic Results Section */}
-            {result && (
-              <div className="mt-12 space-y-8 animate-fade-in">
-                {/* Result Header */}
-                <GlassCard className="border-emerald-500/30">
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <Badge variant="healthy">{result.prediction.details?.crop || 'Crop'}</Badge>
-                        <Badge variant={mapSeverityToBadge(result.prediction.details?.severity)}>
-                          Severity: {result.prediction.details?.severity || 'Moderate'}
-                        </Badge>
-                        <Badge variant="neutral">
-                          {result.prediction.details?.pathogen_type || 'Pathogen'}
-                        </Badge>
-                      </div>
-                      <h2 className="text-2xl md:text-3xl font-black text-slate-100 mt-2">
-                        {result.prediction.details?.common_name || result.prediction.disease_name}
-                      </h2>
-                      <p className="text-xs text-emerald-400/80 italic mt-1">
-                        Scientific Name: {result.prediction.details?.scientific_name}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-4 bg-forest-950/80 px-6 py-4 rounded-2xl border border-emerald-500/20 text-right">
-                      <div>
-                        <div className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
-                          Confidence
-                        </div>
-                        <div className={`text-3xl font-black ${
-                          result.prediction.confidence < 0.60 ? 'text-amber-400' : 'text-sprout-400'
-                        }`}>
-                          {(result.prediction.confidence * 100).toFixed(1)}%
-                        </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          Inference: {result.inference_time_ms} ms
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {result.prediction.confidence < 0.60 && (
-                    <div className="mt-4 p-3.5 rounded-xl bg-amber-950/70 border border-amber-500/30 text-amber-200 text-xs flex items-center gap-2.5">
-                      <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>
-                        <strong>Low Confidence Warning ({(result.prediction.confidence * 100).toFixed(1)}%):</strong>{' '}
-                        The model is uncertain about this image. Please ensure a single plant leaf is well-lit, clearly centered, and fills the scanner guide.
-                      </span>
-                    </div>
-                  )}
-                </GlassCard>
-
-                {/* Grad-CAM Visual Heatmap */}
-                {result.heatmap_base64 && (
-                  <GlassCard>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <Flame className="w-5 h-5 text-amber-400" />
-                        <h3 className="text-base font-bold text-slate-200">
-                          Explainable AI (Grad-CAM) Visual Heatmap
-                        </h3>
-                      </div>
-                      <Badge variant="sprout">Feature Focus Overlay</Badge>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                      <div className="text-center">
-                        <p className="text-xs text-slate-400 mb-2 font-medium">Original Leaf Photo</p>
-                        {previewUrl && (
-                          <img
-                            src={previewUrl}
-                            alt="Original leaf photo"
-                            className="max-h-64 mx-auto rounded-xl border border-emerald-500/20 shadow-md"
-                          />
-                        )}
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xs text-emerald-400 mb-2 font-medium">
-                          Infected Spot Activation Heatmap
-                        </p>
-                        <img
-                          src={result.heatmap_base64}
-                          alt="Grad-CAM Disease Heatmap"
-                          className="max-h-64 mx-auto rounded-xl border border-amber-500/40 shadow-glow-emerald"
-                        />
-                      </div>
-                    </div>
-                  </GlassCard>
-                )}
-
-                {/* Treatment Guidance Tabs */}
-                {result.prediction.details && (
-                  <GlassCard>
-                    <div className="flex border-b border-emerald-500/15 mb-6 space-x-2 overflow-x-auto">
-                      <button
-                        onClick={() => setActiveRemedyTab('remedies')}
-                        className={`pb-3 px-4 text-xs font-bold border-b-2 transition ${
-                          activeRemedyTab === 'remedies'
-                            ? 'border-emerald-400 text-emerald-400'
-                            : 'border-transparent text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        🌱 Organic Remedies
-                      </button>
-                      <button
-                        onClick={() => setActiveRemedyTab('chemical')}
-                        className={`pb-3 px-4 text-xs font-bold border-b-2 transition ${
-                          activeRemedyTab === 'chemical'
-                            ? 'border-emerald-400 text-emerald-400'
-                            : 'border-transparent text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        🧪 Chemical Treatments
-                      </button>
-                      <button
-                        onClick={() => setActiveRemedyTab('symptoms')}
-                        className={`pb-3 px-4 text-xs font-bold border-b-2 transition ${
-                          activeRemedyTab === 'symptoms'
-                            ? 'border-emerald-400 text-emerald-400'
-                            : 'border-transparent text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        🔍 Diagnostic Symptoms
-                      </button>
-                      <button
-                        onClick={() => setActiveRemedyTab('prevention')}
-                        className={`pb-3 px-4 text-xs font-bold border-b-2 transition ${
-                          activeRemedyTab === 'prevention'
-                            ? 'border-emerald-400 text-emerald-400'
-                            : 'border-transparent text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        🛡️ Preventive Care
-                      </button>
-                    </div>
-
-                    <div className="text-sm">
-                      {activeRemedyTab === 'remedies' && (
-                        <ul className="space-y-2.5">
-                          {result.prediction.details.organic_remedies.map((remedy, i) => (
-                            <li key={i} className="flex items-start gap-2.5 text-slate-300">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                              <span>{remedy}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {activeRemedyTab === 'chemical' && (
-                        <ul className="space-y-2.5">
-                          {result.prediction.details.chemical_treatments.map((treatment, i) => (
-                            <li key={i} className="flex items-start gap-2.5 text-slate-300">
-                              <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                              <span>{treatment}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {activeRemedyTab === 'symptoms' && (
-                        <ul className="space-y-2.5">
-                          {result.prediction.details.symptoms.map((symptom, i) => (
-                            <li key={i} className="flex items-start gap-2.5 text-slate-300">
-                              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                              <span>{symptom}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {activeRemedyTab === 'prevention' && (
-                        <ul className="space-y-2.5">
-                          {result.prediction.details.preventive_protocols.map((protocol, i) => (
-                            <li key={i} className="flex items-start gap-2.5 text-slate-300">
-                              <CheckCircle2 className="w-4 h-4 text-sprout-400 shrink-0 mt-0.5" />
-                              <span>{protocol}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </GlassCard>
-                )}
+            {/* Diagnostic Results Dashboard with Grad-CAM Heatmap Viewer & Botanical Cures */}
+            {result && previewUrl && (
+              <div className="mt-12">
+                <DiagnosticReport
+                  result={result}
+                  originalImageUrl={previewUrl}
+                  onScanAnother={() => {
+                    setSelectedFile(null);
+                    setPreviewUrl(null);
+                    setResult(null);
+                    setErrorMessage(null);
+                  }}
+                  onSaveScan={async () => {
+                    try {
+                      const res = await fetch('http://localhost:8000/api/v1/scans', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          crop: result.prediction.details?.crop || 'Unknown',
+                          disease_name: result.prediction.disease_name,
+                          common_name: result.prediction.details?.common_name,
+                          scientific_name: result.prediction.details?.scientific_name,
+                          confidence: result.prediction.confidence,
+                          severity: result.prediction.details?.severity || 'Moderate',
+                          notes: `Diagnostic scan generated by LeafScanner UI with ${(result.prediction.confidence * 100).toFixed(1)}% confidence`,
+                        }),
+                      });
+                      return res.ok;
+                    } catch {
+                      return false;
+                    }
+                  }}
+                />
               </div>
             )}
           </section>
