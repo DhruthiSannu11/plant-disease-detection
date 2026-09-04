@@ -41,9 +41,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     const checkApiHealth = async () => {
       const start = performance.now();
       try {
-        const res = await fetch('http://localhost:8000/api/v1/health', {
-          cache: 'no-store',
-        });
+        let res = await fetch('/api/v1/health', { cache: 'no-store' });
+        if (!res.ok) {
+          res = await fetch('http://127.0.0.1:8000/api/v1/health', { cache: 'no-store' });
+        }
         const duration = Math.round(performance.now() - start);
         if (isMounted) {
           if (res.ok) {
@@ -54,9 +55,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           }
         }
       } catch {
-        if (isMounted) {
-          setIsOnline(false);
-          setLatencyMs(null);
+        try {
+          const res = await fetch('http://127.0.0.1:8000/api/v1/health', { cache: 'no-store' });
+          const duration = Math.round(performance.now() - start);
+          if (isMounted) {
+            if (res.ok) {
+              setIsOnline(true);
+              setLatencyMs(duration);
+            } else {
+              setIsOnline(false);
+            }
+          }
+        } catch {
+          if (isMounted) {
+            setIsOnline(false);
+            setLatencyMs(null);
+          }
         }
       }
     };

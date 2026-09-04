@@ -77,7 +77,7 @@ export default function Home() {
   useEffect(() => {
     if (currentTab === 'outbreaks') {
       setStatsLoading(true);
-      fetch('http://localhost:8000/api/v1/outbreaks/stats')
+      fetch('/api/v1/outbreaks/stats')
         .then((res) => res.json())
         .then((data) => setOutbreakStats(data))
         .catch(() => setOutbreakStats(null))
@@ -96,7 +96,7 @@ export default function Home() {
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/predict', {
+      const response = await fetch('/api/v1/predict', {
         method: 'POST',
         body: formData,
       });
@@ -130,7 +130,7 @@ export default function Home() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const apiRes = await fetch('http://localhost:8000/api/v1/predict', {
+      const apiRes = await fetch('/api/v1/predict', {
         method: 'POST',
         body: formData,
       });
@@ -305,7 +305,7 @@ export default function Home() {
                         headers['Authorization'] = `Bearer ${token}`;
                       }
 
-                      const res = await fetch('http://localhost:8000/api/v1/scans', {
+                      const res = await fetch('/api/v1/scans', {
                         method: 'POST',
                         headers,
                         body: JSON.stringify({
