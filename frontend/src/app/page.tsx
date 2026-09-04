@@ -108,6 +108,40 @@ export default function Home() {
     }
   };
 
+  const handleLoadSample = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    setResult(null);
+
+    try {
+      const res = await fetch('/sample_leaf.jpg');
+      const blob = await res.blob();
+      const file = new File([blob], 'sample_leaf.jpg', { type: 'image/jpeg' });
+      setSelectedFile(file);
+      setPreviewUrl('/sample_leaf.jpg');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const apiRes = await fetch('http://localhost:8000/api/v1/predict', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await apiRes.json();
+
+      if (!apiRes.ok) {
+        throw new Error(data.detail || 'Demo analysis failed.');
+      }
+
+      setResult(data);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to load demo sample.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Navbar activeTab={currentTab} onTabChange={setCurrentTab} />
@@ -212,16 +246,28 @@ export default function Home() {
                   </div>
                 )}
 
-                <Button
-                  variant="primary"
-                  size="lg"
-                  disabled={!selectedFile || loading}
-                  isLoading={loading}
-                  onClick={handleAnalyze}
-                  className="w-full"
-                >
-                  Analyze Leaf & Generate Heatmap
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    disabled={!selectedFile || loading}
+                    isLoading={loading}
+                    onClick={handleAnalyze}
+                    className="w-full shadow-glow-emerald"
+                  >
+                    Analyze Leaf & Generate Heatmap
+                  </Button>
+
+                  <button
+                    type="button"
+                    onClick={handleLoadSample}
+                    disabled={loading}
+                    className="w-full py-2.5 px-4 text-xs font-semibold text-emerald-300 hover:text-emerald-200 bg-forest-900/80 hover:bg-forest-800 border border-emerald-500/25 rounded-xl transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4 text-sprout-400" />
+                    <span>⚡ Try Demo Leaf Sample (Instant 1-Click Diagnostics)</span>
+                  </button>
+                </div>
               </GlassCard>
             </div>
 
