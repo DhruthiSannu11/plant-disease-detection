@@ -83,6 +83,31 @@ services:
       timeout: 5s
       retries: 5
 
+  # 5. Celery Asynchronous Background Worker
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: plant_disease_worker
+    restart: unless-stopped
+    command: celery -A backend.app.workers.celery_app.celery_app worker --loglevel=info
+    env_file:
+      - .env
+    environment:
+      - ENVIRONMENT=development
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+
 volumes:
   postgres_data:
     driver: local

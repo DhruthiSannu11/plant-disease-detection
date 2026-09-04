@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from backend.app.api.v1.predict import router as predict_router
 from backend.app.api.v1.auth import router as auth_router
 from backend.app.api.v1.scans import router as scans_router
+from backend.app.api.v1.outbreaks import router as outbreaks_router
 from backend.app.db.session import init_db
 
 from contextlib import asynccontextmanager
@@ -44,6 +45,7 @@ app.add_middleware(
 app.include_router(predict_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(scans_router, prefix="/api/v1")
+app.include_router(outbreaks_router, prefix="/api/v1")
 
 
 class HealthResponse(BaseModel):
