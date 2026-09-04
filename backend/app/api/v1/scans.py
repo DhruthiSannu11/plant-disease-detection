@@ -78,7 +78,7 @@ def create_scan_record(
     response_model=ScanListResponse,
     status_code=status.HTTP_200_OK,
     summary="Get Paginated Scan History",
-    description="Retrieve paginated scan history for the authenticated user with optional crop and severity filters.",
+    description="Retrieve paginated scan history for the authenticated user or recent scans for guests with optional filters.",
 )
 def list_user_scans(
     skip: int = Query(0, ge=0, description="Offset number of records"),
@@ -87,10 +87,12 @@ def list_user_scans(
     disease_name: Optional[str] = Query(None, description="Filter by disease name"),
     severity: Optional[str] = Query(None, description="Filter by severity level (Low, Moderate, High, Critical)"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ) -> ScanListResponse:
-    """List historical scan records for the logged-in user."""
-    query = db.query(ScanRecord).filter(ScanRecord.user_id == current_user.id)
+    """List historical scan records for the logged-in user or recent scans for guest."""
+    query = db.query(ScanRecord)
+    if current_user:
+        query = query.filter(ScanRecord.user_id == current_user.id)
 
     if crop:
         query = query.filter(ScanRecord.crop.ilike(f"%{crop}%"))
@@ -155,12 +157,12 @@ def get_scan_by_id(
     "/{scan_id}",
     status_code=status.HTTP_200_OK,
     summary="Delete Scan Record",
-    description="Delete a plant disease scan entry from the user's history.",
+    description="Delete a plant disease scan entry from history.",
 )
 def delete_scan_record(
     scan_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     """Delete a scan record."""
     scan = db.query(ScanRecord).filter(ScanRecord.id == scan_id).first()
@@ -170,11 +172,12 @@ def delete_scan_record(
             detail=f"Scan record with ID {scan_id} not found.",
         )
 
-    if scan.user_id != current_user.id and not current_user.is_superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to delete this scan record.",
-        )
+    if scan.user_id is not None:
+        if not current_user or (scan.user_id != current_user.id and not current_user.is_superuser):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to delete this scan record.",
+            )
 
     db.delete(scan)
     db.commit()
