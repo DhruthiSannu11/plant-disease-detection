@@ -283,7 +283,9 @@ export default function Home() {
                         <div className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
                           Confidence
                         </div>
-                        <div className="text-3xl font-black text-sprout-400">
+                        <div className={`text-3xl font-black ${
+                          result.prediction.confidence < 0.60 ? 'text-amber-400' : 'text-sprout-400'
+                        }`}>
                           {(result.prediction.confidence * 100).toFixed(1)}%
                         </div>
                         <div className="text-[10px] text-slate-400 mt-0.5">
@@ -292,6 +294,16 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
+
+                  {result.prediction.confidence < 0.60 && (
+                    <div className="mt-4 p-3.5 rounded-xl bg-amber-950/70 border border-amber-500/30 text-amber-200 text-xs flex items-center gap-2.5">
+                      <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>
+                        <strong>Low Confidence Warning ({(result.prediction.confidence * 100).toFixed(1)}%):</strong>{' '}
+                        The model is uncertain about this image. Please ensure a single plant leaf is well-lit, clearly centered, and fills the scanner guide.
+                      </span>
+                    </div>
+                  )}
                 </GlassCard>
 
                 {/* Grad-CAM Visual Heatmap */}

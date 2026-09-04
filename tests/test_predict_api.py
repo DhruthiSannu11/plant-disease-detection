@@ -132,3 +132,31 @@ def test_predict_non_plant_object_image():
     data = response.json()
     assert "detail" in data
     assert "Non-Plant Image Detected" in data["detail"]
+
+
+def test_predict_low_confidence_threshold(monkeypatch):
+    """Verify that predictions below the 45% confidence threshold trigger HTTP 422 error."""
+    mock_low_conf_predictions = [
+        {"class_id": 29, "disease_name": "Tomato___Early_blight", "confidence": 0.284},
+        {"class_id": 30, "disease_name": "Tomato___Late_blight", "confidence": 0.250},
+        {"class_id": 32, "disease_name": "Tomato___Septoria_leaf_spot", "confidence": 0.200},
+    ]
+
+    from backend.app.services.onnx_service import ONNXInferenceService
+    monkeypatch.setattr(ONNXInferenceService, "predict", lambda self, img, top_k=3: (mock_low_conf_predictions, 20.0))
+
+    # Create dummy leaf with sufficient green color to pass green mask filter
+    green_np = np.zeros((224, 224, 3), dtype=np.uint8)
+    green_np[:, :] = [34, 139, 34]  # Forest green
+    img = Image.fromarray(green_np)
+    buffer = io.BytesIO()
+    img.save(buffer, format="JPEG")
+
+    files = {"file": ("low_conf_leaf.jpg", buffer.getvalue(), "image/jpeg")}
+    response = client.post("/api/v1/predict", files=files)
+
+    assert response.status_code == 422
+    data = response.json()
+    assert "detail" in data
+    assert "Low Confidence Detected" in data["detail"]
+

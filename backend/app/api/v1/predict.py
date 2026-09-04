@@ -133,6 +133,19 @@ async def predict_plant_disease(
         details=diagnosis_service.get_diagnosis(top_1_raw["disease_name"]),
     )
 
+    # 5b. Minimum Confidence Threshold Guardrail (e.g., 45% / 0.45)
+    # Authentic leaf scans score >85% confidence. Non-plant objects (phones, hands, rooms) produce flat distributions (<35%).
+    MIN_CONFIDENCE_THRESHOLD = 0.45
+    if top_1_prediction.confidence < MIN_CONFIDENCE_THRESHOLD:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"⚠️ Non-Plant Image / Low Confidence Detected ({top_1_prediction.confidence * 100:.1f}%). "
+                "The AI model does not recognize this image as a known crop leaf. "
+                "Please upload or capture a clear, focused photo of a plant leaf."
+            ),
+        )
+
     top_k_predictions = [
         ClassPrediction(
             class_id=p["class_id"],
