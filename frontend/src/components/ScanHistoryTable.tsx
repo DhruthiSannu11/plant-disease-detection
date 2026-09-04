@@ -58,7 +58,7 @@ interface ScanHistoryTableProps {
   onOpenAuth?: () => void;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const ScanHistoryTable: React.FC<ScanHistoryTableProps> = ({
   onStartNewScan,
@@ -133,23 +133,28 @@ export const ScanHistoryTable: React.FC<ScanHistoryTableProps> = ({
     fetchScans();
   };
 
-  const handleDeleteScan = async (id: number) => {
-    if (!confirm('Are you sure you want to remove this scan from your history?')) return;
+  const handleDeleteScan = async (item: ScanItem) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete Scan #${item.id} (${item.crop} - ${item.disease_name}) from the database?`
+      )
+    )
+      return;
 
-    setDeletingId(id);
+    setDeletingId(item.id);
     try {
       const headers: HeadersInit = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`${API_BASE_URL}/api/v1/scans/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/scans/${item.id}`, {
         method: 'DELETE',
         headers,
       });
 
       if (res.ok) {
-        setScans((prev) => prev.filter((s) => s.id !== id));
+        setScans((prev) => prev.filter((s) => s.id !== item.id));
         setTotalCount((prev) => Math.max(0, prev - 1));
       } else {
         const data = await res.json();
@@ -382,6 +387,7 @@ export const ScanHistoryTable: React.FC<ScanHistoryTableProps> = ({
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-forest-900/90 text-slate-400 font-semibold border-b border-emerald-500/15">
                 <tr>
+                  <th className="py-3.5 px-4">Scan ID</th>
                   <th className="py-3.5 px-4">Crop & Disease</th>
                   <th className="py-3.5 px-4 hidden sm:table-cell">Scientific Classification</th>
                   <th className="py-3.5 px-4">Severity</th>
@@ -396,6 +402,13 @@ export const ScanHistoryTable: React.FC<ScanHistoryTableProps> = ({
                     key={item.id}
                     className="hover:bg-forest-900/40 transition duration-150"
                   >
+                    {/* Scan ID Badge */}
+                    <td className="py-3.5 px-4 font-mono font-bold">
+                      <span className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-[11px]">
+                        #{item.id}
+                      </span>
+                    </td>
+
                     {/* Crop & Disease */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
@@ -421,7 +434,7 @@ export const ScanHistoryTable: React.FC<ScanHistoryTableProps> = ({
                     {/* Severity Badge */}
                     <td className="py-3.5 px-4">
                       <Badge variant={getSeverityBadgeVariant(item.severity)}>
-                        {item.severity}
+                        {item.severity || 'Moderate'}
                       </Badge>
                     </td>
 
@@ -454,15 +467,15 @@ export const ScanHistoryTable: React.FC<ScanHistoryTableProps> = ({
                         <button
                           onClick={() => setViewingScan(item)}
                           className="p-1.5 rounded-lg bg-forest-800/80 hover:bg-forest-700 text-emerald-300 hover:text-emerald-200 border border-emerald-500/20 transition cursor-pointer"
-                          title="View botanical treatment & symptoms"
+                          title={`View full diagnosis & treatment for Scan #${item.id}`}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteScan(item.id)}
+                          onClick={() => handleDeleteScan(item)}
                           disabled={deletingId === item.id}
                           className="p-1.5 rounded-lg bg-forest-800/80 hover:bg-rose-900/60 text-slate-400 hover:text-rose-300 border border-rose-500/20 transition cursor-pointer"
-                          title="Delete scan"
+                          title={`Delete Scan #${item.id}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -528,7 +541,10 @@ export const ScanHistoryTable: React.FC<ScanHistoryTableProps> = ({
                   🌿
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-mono text-xs font-bold">
+                      Scan #{viewingScan.id}
+                    </span>
                     <h3 className="text-lg font-bold text-slate-100">
                       {viewingScan.disease_name}
                     </h3>
